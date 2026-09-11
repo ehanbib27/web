@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rayhan | Portofolio</title>
+    <title>Rayhan | About Me</title>
     <style>
         /* === RESET & VARIABEL TEMA === */
         * {
@@ -46,6 +46,55 @@
             transition: background-color 0.4s ease, color 0.4s ease;
             background-image: radial-gradient(var(--card-border) 1px, transparent 1px);
             background-size: 26px 26px;
+            overflow-x: hidden;
+        }
+
+        /* Animated background pattern */
+        .bg-pattern {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image: radial-gradient(var(--card-border) 1px, transparent 1px);
+            background-size: 26px 26px;
+            animation: patternMove 20s linear infinite;
+            opacity: 0.4;
+        }
+        @keyframes patternMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 26px 26px; }
+        }
+
+        /* Parallax floating particles */
+        #particles-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat var(--p-duration) ease-in-out infinite;
+            animation-delay: var(--p-delay);
+        }
+        @keyframes particleFloat {
+            0% { 
+                transform: translateY(100vh) scale(0); 
+                opacity: 0; 
+            }
+            15% { 
+                opacity: var(--p-opacity); 
+            }
+            85% { 
+                opacity: var(--p-opacity); 
+            }
+            100% { 
+                transform: translateY(-10vh) scale(1); 
+                opacity: 0; 
+            }
         }
 
         /* === NAVIGASI === */
@@ -99,41 +148,86 @@
             border-radius: 3px;
         }
 
-        /* Pembatas dekoratif antar section */
-        .section-divider {
-            display: flex; align-items: center; justify-content: center; gap: 14px;
-            padding: 50px 0;
+        /* Pembatas dekoratif antar section - Gradient Wave */
+        .wave-divider {
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+            margin: -1px 0;
         }
-        .section-divider .line {
-            width: 50px; height: 1px; background: var(--card-border); border-radius: 0; opacity: 0.6;
+        .wave-divider svg {
+            display: block;
+            width: 100%;
+            height: 50px;
+        }
+        .wave-divider .wave-fill {
+            fill: var(--card-border);
+            opacity: 0.35;
         }
 
-        /* Ikon tanaman bergoyang untuk mengisi celah antar section */
-        .plant-icon {
-            width: 34px; height: 34px; color: var(--plant-color); opacity: 0.75;
-            transform-origin: bottom center; animation: sway 4.5s ease-in-out infinite;
-        }
         @keyframes sway {
             0%, 100% { transform: rotate(-4deg); }
             50% { transform: rotate(4deg); }
         }
 
-        /* Tanaman pot besar tetap di sudut layar */
-        .corner-plant {
-            position: fixed; bottom: 0; left: 18px; width: 90px; height: 110px;
-            color: var(--plant-color); opacity: 0.55; z-index: 1; pointer-events: none;
-            transform-origin: bottom center; animation: sway 6s ease-in-out infinite;
+        /* Bintang twinkling di pojok kiri bawah */
+        .corner-stars {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            z-index: 1;
+            pointer-events: none;
+            display: flex;
+            gap: 8px;
+        }
+        .star {
+            opacity: 0.3;
+            animation: twinkle 2.5s ease-in-out infinite;
+            color: var(--accent-color);
+        }
+        .star:nth-child(1) { animation-delay: 0s; }
+        .star:nth-child(2) { animation-delay: 0.7s; }
+        .star:nth-child(3) { animation-delay: 1.4s; }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.15; transform: scale(0.85); }
+            50% { opacity: 0.65; transform: scale(1.15); }
         }
 
         /* === KARTU KONTEN & ANIMASI SCROLL === */
         .card {
-            background-color: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px;
+            background-color: var(--card-bg); border-radius: 12px;
             padding: 30px; margin-bottom: 20px; box-shadow: var(--shadow); 
+            position: relative;
+            
+            /* Animated gradient border */
+            border: 2px solid transparent;
+            background-clip: padding-box;
+            background-origin: border-box;
             
             /* Posisi awal sebelum muncul */
             opacity: 0;
             transform: translateY(50px);
             transition: opacity 0.6s ease-out, transform 0.6s ease-out, background-color 0.4s ease;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--accent-color), #e91e63, #ff9800, var(--accent-color));
+            background-size: 300% 300%;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            animation: gradientShift 4s ease infinite;
+        }
+        .card:hover::before {
+            opacity: 1;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         /* Kelas yang ditambahkan via JavaScript saat kotak masuk ke layar */
@@ -148,15 +242,92 @@
             transition: transform 0.3s ease, background-color 0.4s ease;
         }
 
-        /* Spesial untuk Kartu Keahlian (Foto Skala 1:1) */
+        /* Zigzag layout untuk Keahlian */
+        .zigzag-card {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            padding: 25px;
+        }
+        .zigzag-card:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+        .zigzag-card .img-wrap {
+            flex: 0 0 50%;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+        }
+        .zigzag-card .img-wrap img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            display: block;
+            background-color: var(--card-border);
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+        .zigzag-card .img-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(52,152,219,0.3), rgba(233,30,99,0.3));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 10px;
+        }
+        .zigzag-card .img-wrap:hover img {
+            transform: scale(1.06);
+            filter: brightness(1.1);
+        }
+        .zigzag-card .img-wrap:hover::after {
+            opacity: 1;
+        }
+        .zigzag-text {
+            flex: 1;
+            text-align: left;
+        }
+        .zigzag-text h3 {
+            margin-bottom: 12px;
+            font-size: 1.25rem;
+            color: var(--accent-color);
+        }
+        .zigzag-text p {
+            font-size: 0.95rem;
+            line-height: 1.65;
+            opacity: 0.9;
+        }
+
+        /* Spesial untuk Kartu Keahlian lama (grid) - fallback */
         .skill-card { text-align: center; padding: 20px; }
-        .skill-card img { 
+        .skill-card .img-wrap {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .skill-card .img-wrap img { 
             width: 100%; 
-            aspect-ratio: 1 / 1; 
+            aspect-ratio: 16 / 9; 
             object-fit: cover; 
-            border-radius: 8px; 
-            margin-bottom: 15px; 
+            display: block;
             background-color: var(--card-border); 
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+        .skill-card .img-wrap::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(52,152,219,0.3), rgba(233,30,99,0.3));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 8px;
+        }
+        .skill-card .img-wrap:hover img {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+        .skill-card .img-wrap:hover::after {
+            opacity: 1;
         }
         .skill-card h3 { margin-bottom: 10px; font-size: 1.2rem; }
         .skill-card p { font-size: 0.95rem; opacity: 0.9; line-height: 1.5; margin-bottom: 15px; }
@@ -246,8 +417,10 @@
         /* Kartu Biodata dengan foto */
         .biodata-card { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-start; }
         .biodata-photo {
-            width: 150px; height: 190px; flex-shrink: 0; border-radius: 8px;
+            width: 200px; height: 250px; flex-shrink: 0; border-radius: 8px;
             object-fit: cover; background-color: var(--card-border); border: 1px solid var(--card-border);
+            transition: transform 0.4s ease, filter 0.4s ease;
+            cursor: pointer;
         }
         .biodata-info { flex: 1; min-width: 220px; text-align: left; }
         @media (max-width: 500px) {
@@ -280,11 +453,13 @@
             .nav-links li { margin-left: 0; width: 100%; padding: 8px 0; }
             #beranda h1 { font-size: 2.5rem; }
             .grid { grid-template-columns: 1fr; }
-            .biodata-photo { width: 120px; height: 150px; }
             .corner-mark { display: none; }
-            .corner-plant { display: none; }
+            .corner-stars { display: none; }
+            .zigzag-card { flex-direction: column !important; gap: 15px; }
+            .zigzag-card .img-wrap { flex: 0 0 auto; width: 100%; }
+            .biodata-photo { width: 160px; height: 200px; }
             section { padding: 80px 0 50px; }
-            .section-divider { padding: 30px 0; }
+            .wave-divider svg { height: 30px; }
         }
     </style>
 
@@ -317,19 +492,25 @@
     </style>
 </head>
 <body>
+    <div class="bg-pattern" aria-hidden="true"></div>
+    <div id="particles-container" aria-hidden="true"></div>
     <div id="leaves-container" aria-hidden="true"></div>
     <div class="corner-mark tl"></div>
     <div class="corner-mark br"></div>
-    <svg class="corner-plant" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 16h12l-2 6H8z"/>
-        <path d="M12 16c-1.5-6-6-8-7-13"/>
-        <path d="M12 16c1.5-7 6-9 7-14"/>
-        <path d="M12 16c-1-5 1-8 0-13"/>
-        <path d="M12 16c1-4 -1-6 0-10"/>
-    </svg>
+    <div class="corner-stars">
+        <svg class="star" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/>
+        </svg>
+        <svg class="star" width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/>
+        </svg>
+        <svg class="star" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9"/>
+        </svg>
+    </div>
 
     <nav>
-        <a href="#beranda" class="logo">Portofolio.</a>
+        <a href="#beranda" class="logo">About Me.</a>
         <ul class="nav-links">
             <li><a href="#biodata" class="nav-link">Biodata</a></li>
             <li><a href="#pendidikan" class="nav-link">Pendidikan</a></li>
@@ -365,13 +546,13 @@
             </div>
         </section>
 
-        <div class="section-divider"><span class="line"></span><svg class="plant-icon" style="animation-delay:0s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10l-1.5 5h-7z"/><path d="M12 15c-1-4-4-5-5-9"/><path d="M12 15c1-5 4-6 5-10"/><path d="M12 15c0-4 1-6 0-9"/></svg><span class="line"></span></div>
+        <div class="wave-divider"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path class="wave-fill" d="M0,25 C150,50 350,0 600,25 C850,50 1050,0 1200,25 L1200,50 L0,50 Z"/></svg></div>
 
         <!-- 2. Biodata -->
         <section id="biodata">
             <h2 class="section-title">Biodata</h2>
             <div class="card biodata-card">
-                <img src="foto-profil.jpg" alt="Foto Rayhan" class="biodata-photo">
+                <img src="foto saya.png" alt="Foto Rayhan" class="biodata-photo">
                 <div class="biodata-info">
                     <p><strong>Nama Lengkap:</strong> Rayhan Labib Ramadan</p>
                     <br>
@@ -389,61 +570,86 @@
             </div>
         </section>
 
-        <div class="section-divider"><span class="line"></span><svg class="plant-icon" style="animation-delay:0.8s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10l-1.5 5h-7z"/><path d="M12 15c-1-4-4-5-5-9"/><path d="M12 15c1-5 4-6 5-10"/><path d="M12 15c0-4 1-6 0-9"/></svg><span class="line"></span></div>
+        <div class="wave-divider"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path class="wave-fill" d="M0,25 C200,0 400,50 600,25 C800,0 1000,50 1200,25 L1200,50 L0,50 Z"/></svg></div>
 
         <!-- 3. Pendidikan -->
         <section id="pendidikan">
             <h2 class="section-title">Pendidikan</h2>
-            <div class="card">
-                <h3>SMK Negeri 1</h3>
-                <p><strong>Jurusan:</strong> Teknik Komputer Jaringan (TKJ)</p>
-                <br>
-                <p>Mempelajari dasar-dasar infrastruktur jaringan, administrasi server Linux (Debian), konfigurasi perangkat jaringan (MikroTik), dan implementasi teknologi Fiber Optik.</p>
+            <div class="grid">
+                <div class="card">
+                    <h3>SD Negeri 028</h3>
+                    <p><strong>Periode:</strong> 2015 - 2021</p>
+                    <br>
+                    <p>Menempuh pendidikan dasar selama 6 tahun. Mengembangkan kemampuan dasar akademik seperti matematika, bahasa Indonesia, dan bahasa Inggris. Aktif dalam kegiatan ekstrakurikuler dan pengembangan karakter sejak dini.</p>
+                </div>
+                <div class="card">
+                    <h3>SMP Negeri 1 Tenggarong</h3>
+                    <p><strong>Periode:</strong> 2021 - 2024</p>
+                    <br>
+                    <p>Menempuh pendidikan menengah pertama. Mulai mengenal dunia teknologi dan komputer. Mengikuti kegiatan ekstrakurikuler yang berkaitan dengan IT dan memperoleh dasar-dasar pengetahuan jaringan komputer.</p>
+                </div>
+                <div class="card">
+                    <h3>SMK Negeri 1 Tenggarong</h3>
+                    <p><strong>Jurusan:</strong> Teknik Komputer Jaringan (TKJ)</p>
+                    <p><strong>Periode:</strong> 2024 - Sekarang</p>
+                    <br>
+                    <p>Menempuh pendidikan kejuruan dengan fokus pada infrastruktur jaringan, administrasi server Linux (Debian), konfigurasi perangkat jaringan (MikroTik), dan implementasi teknologi Fiber Optik.</p>
+                </div>
             </div>
         </section>
 
-        <div class="section-divider"><span class="line"></span><svg class="plant-icon" style="animation-delay:1.6s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10l-1.5 5h-7z"/><path d="M12 15c-1-4-4-5-5-9"/><path d="M12 15c1-5 4-6 5-10"/><path d="M12 15c0-4 1-6 0-9"/></svg><span class="line"></span></div>
+        <div class="wave-divider"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path class="wave-fill" d="M0,30 C300,0 600,50 900,20 C1050,10 1150,40 1200,30 L1200,50 L0,50 Z"/></svg></div>
 
         <!-- 3. Keahlian -->
         <section id="keahlian">
             <h2 class="section-title">Keahlian Teknis</h2>
-            <div class="grid">
-                <div class="card skill-card">
-                    <img src="https://via.placeholder.com/400x400/e9ecef/2c3e50?text=Sistem+Jaringan" alt="Sistem Jaringan">
+            <div class="card zigzag-card">
+                <div class="img-wrap">
+                    <img src="https://via.placeholder.com/600x340/1a3a5c/64b5f6?text=Sistem+Jaringan" alt="Sistem Jaringan">
+                </div>
+                <div class="zigzag-text">
                     <h3>Administrasi Sistem Jaringan</h3>
-                    <p>Konfigurasi DNS, Web Server, dan manajemen sistem operasi jaringan menggunakan Debian.</p>
+                    <p>Menguasai konfigurasi DNS, Web Server (Apache/Nginx), DHCP, dan manajemen sistem operasi jaringan berbasis Linux Debian. Mampu mengelola user, hak akses, serta melakukan monitoring dan troubleshooting jaringan menggunakan tool seperti Wireshark dan Winbox. Terbiasa bekerja dengan perintah CLI untuk konfigurasi layanan jaringan secara efisien.</p>
                 </div>
-                <div class="card skill-card">
-                    <img src="https://via.placeholder.com/400x400/e9ecef/2c3e50?text=Infra+Jaringan" alt="Infrastruktur Jaringan">
-                    <h3>Administrasi Infrastruktur</h3>
-                    <p>Perancangan topologi, konfigurasi router MikroTik, switch, dan pengelolaan Fiber Optik.</p>
+            </div>
+            <div class="card zigzag-card">
+                <div class="img-wrap">
+                    <img src="https://via.placeholder.com/600x340/2d5a27/4ade80?text=Infrastruktur" alt="Infrastruktur Jaringan">
                 </div>
-                <div class="card skill-card">
-                    <img src="https://via.placeholder.com/400x400/e9ecef/2c3e50?text=Hardware+PC" alt="Hardware">
+                <div class="zigzag-text">
+                    <h3>Administrasi Infrastruktur Jaringan</h3>
+                    <p>Merancang dan mengimplementasikan topologi jaringan sesuai kebutuhan, baik topologi star, bus, maupun mesh. Mengkonfigurasi router MikroTik, managed switch, dan access point untuk membangun jaringan yang stabil dan aman. Memahami konsep VLAN, firewall rules, load balancing, dan failover. Terbiasa dengan instalasi dan splicing Fiber Optik (FO) untuk jaringan backbone.</p>
+                </div>
+            </div>
+            <div class="card zigzag-card">
+                <div class="img-wrap">
+                    <img src="hardware.jpeg" alt="Hardware">
+                </div>
+                <div class="zigzag-text">
                     <h3>Hardware & Troubleshooting</h3>
-                    <p>Perakitan komputer, diagnosa kerusakan perangkat keras, dan pemeliharaan komponen IT.</p>
+                    <p>Terampil dalam perakitan, instalasi, dan konfigurasi perangkat keras komputer desktop maupun server. Mampu melakukan diagnosa kerusakan perangkat keras (hardware) dan perangkat lunak (software) secara sistematis. Menguasai proses instalasi sistem operasi (Windows, Linux), driver, serta pemeliharaan komponen seperti RAM, HDD/SSD, PSU, dan motherboard agar komponen berfungsi optimal.</p>
                 </div>
             </div>
         </section>
 
-        <div class="section-divider"><span class="line"></span><svg class="plant-icon" style="animation-delay:0.4s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10l-1.5 5h-7z"/><path d="M12 15c-1-4-4-5-5-9"/><path d="M12 15c1-5 4-6 5-10"/><path d="M12 15c0-4 1-6 0-9"/></svg><span class="line"></span></div>
+        <div class="wave-divider"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path class="wave-fill" d="M0,20 C150,50 450,0 700,30 C950,50 1100,10 1200,25 L1200,50 L0,50 Z"/></svg></div>
 
         <!-- 4. Proyek -->
         <section id="proyek">
             <h2 class="section-title">Proyek & Praktik</h2>
             <div class="grid">
                 <div class="card">
-                    <h3>Web Portofolio</h3>
+                    <h3>Membuat Web tentang Diri Saya</h3>
                     <p>Membangun antarmuka web statis menggunakan HTML dan CSS murni, dilengkapi fitur Dark Mode dengan JavaScript.</p>
                 </div>
                 <div class="card">
                     <h3>Konfigurasi Server</h3>
-                    <p>Melakukan setup DNS dan Web Server menggunakan Debian 12 pada lingkungan virtual Proxmox.</p>
+                    <p>Melakukan setup DNS dan Web Server menggunakan Debian 12 pada Jaringan lokal.</p>
                 </div>
             </div>
         </section>
 
-        <div class="section-divider"><span class="line"></span><svg class="plant-icon" style="animation-delay:1.2s" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 15h10l-1.5 5h-7z"/><path d="M12 15c-1-4-4-5-5-9"/><path d="M12 15c1-5 4-6 5-10"/><path d="M12 15c0-4 1-6 0-9"/></svg><span class="line"></span></div>
+        <div class="wave-divider"><svg viewBox="0 0 1200 50" preserveAspectRatio="none"><path class="wave-fill" d="M0,25 C200,50 500,0 800,30 C1000,50 1150,15 1200,25 L1200,50 L0,50 Z"/></svg></div>
 
         <!-- 5. Kontak -->
         <section id="kontak" style="min-height: auto; padding-bottom: 80px;">
@@ -625,6 +831,35 @@
                 document.querySelectorAll('.falling-leaf').forEach(l => l.classList.remove('paused'));
             }, 150);
         }, { passive: true });
+
+        // 7. FLOATING PARTICLES
+        const particlesContainer = document.getElementById('particles-container');
+        const particleCount = isMobile ? 12 : 25;
+        const colors = ['var(--accent-color)', '#e91e63', '#ff9800', '#4caf50', '#9c27b0'];
+
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            const size = 3 + Math.random() * 5;
+            const x = Math.random() * 100;
+            const duration = 8 + Math.random() * 12;
+            const delay = Math.random() * 10;
+            const opacity = 0.15 + Math.random() * 0.3;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            particle.style.cssText = `
+                width: ${size}px; height: ${size}px;
+                left: ${x}%;
+                background: ${color};
+                --p-duration: ${duration}s;
+                --p-delay: ${delay}s;
+                --p-opacity: ${opacity};
+                box-shadow: 0 0 ${size * 2}px ${color};
+            `;
+            particlesContainer.appendChild(particle);
+        }
+
+        for (let i = 0; i < particleCount; i++) createParticle();
     </script>
 </body>
 </html>
